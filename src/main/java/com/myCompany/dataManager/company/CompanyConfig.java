@@ -19,8 +19,8 @@ public class CompanyConfig {
                     "83742738",
                     "0123-456780",
                     "0123-456781",
-                    "musicstore@gmail.com",
-                    false
+                    "musicstore@gmail.com"
+
             );
 
             Company thomann = new Company(
@@ -30,8 +30,7 @@ public class CompanyConfig {
                     "47563223",
                     "0223-888999",
                     "0223-888998",
-                    "thomann@posteo.de",
-                    false
+                    "thomann@posteo.de"
             );
 
             companyRepository.saveAll(List.of(musicStore,thomann));

@@ -1,11 +1,15 @@
 package com.myCompany.dataManager.company;
 
+import com.myCompany.dataManager.address.Address;
 import com.sun.istack.NotNull;
+import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table
+@SQLDelete(sql = "UPDATE company SET isDeleted = true WHERE company_id=?")
 public class Company {
 
     @Id
@@ -29,7 +33,6 @@ public class Company {
     @Column(name="companynr",
             columnDefinition = "NVARCHAR(80)",
             unique = true)
-    @SequenceGenerator(name = "companynr")
     @NotNull
     private String companyNr;
 
@@ -45,8 +48,11 @@ public class Company {
     @NotNull
     private String emailAddress;
 
-    @Column(name="isdeleted")
-    private Boolean isDeleted;
+    @Column(name="isdeleted", columnDefinition="BIT")
+    private Boolean isDeleted = Boolean.FALSE;
+
+    /*@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
+    private List<Address> address;*/
 
     public Company() {
     }
@@ -57,8 +63,8 @@ public class Company {
                    String companyNr,
                    String phone,
                    String fax,
-                   String emailAddress,
-                   Boolean isDeleted) {
+                   String emailAddress
+                   ) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.companyName = companyName;
@@ -66,7 +72,9 @@ public class Company {
         this.phone = phone;
         this.fax = fax;
         this.emailAddress = emailAddress;
-        this.isDeleted = isDeleted;
+/*
+        this.address = address;
+*/
     }
 
     public void setId(Long id) {
@@ -140,6 +148,14 @@ public class Company {
     public void setDeleted(Boolean deleted) {
         isDeleted = deleted;
     }
+
+    /*public List<Address> getAddress() {
+        return address;
+    }
+
+    public void setAddress(List<Address> address){
+        this.address = address;
+    }*/
 
     @Override
     public String toString() {

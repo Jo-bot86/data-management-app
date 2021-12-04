@@ -13,4 +13,7 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     @Query("SELECT c FROM Company c WHERE c.emailAddress = ?1")
     Optional<Company> findCompanyByEmailAddress(String email);
 
+    @Query("SELECT c FROM Company c WHERE c.companyNr = ?1")
+    Optional<Company> findCompanyByCompanyNumber(String companyNr);
+
 }

@@ -1,5 +1,9 @@
 package com.myCompany.dataManager.company;
 
+import com.myCompany.dataManager.address.Address;
+import com.myCompany.dataManager.address.AddressRepository;
+import com.myCompany.dataManager.address.AddressService;
+import com.myCompany.dataManager.company.exception.CompanyNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,12 +18,14 @@ import java.util.stream.IntStream;
 public class CompanyService {
 
     private final CompanyRepository companyRepository;
+    private final AddressService addressService;
 
     private Random random;
 
     @Autowired
-    public CompanyService(CompanyRepository companyRepository){
+    public CompanyService(CompanyRepository companyRepository, AddressService addressService){
         this.companyRepository = companyRepository;
+        this.addressService = addressService;
     }
 
     public List<Company> getCompanies(){
@@ -27,11 +33,11 @@ public class CompanyService {
     }
 
     public Company getCompanyById(Long companyId) {
-        System.out.println("service");
-        return companyRepository.findById(companyId).get();
+        return companyRepository.findById(companyId).orElseThrow(() ->
+                new CompanyNotFoundException(companyId));
     }
 
-    public void addNewCompany(Company company){
+    public Company addNewCompany(Company company){
         Optional<Company> companyOptional = companyRepository.findCompanyByEmailAddress(company.getEmailAddress());
         if(companyOptional.isPresent() && !companyOptional.get().getDeleted()){
             throw new IllegalStateException(
@@ -47,32 +53,24 @@ public class CompanyService {
         }
         company.setDeleted(false);
         company.setCompanyNr(Integer.toString(companyNumber));
-        companyRepository.save(company);
+        return companyRepository.save(company);
     }
 
-    public void deleteCompany(Long companyId){
-        boolean exists = companyRepository.existsById(companyId);
-        System.out.println(companyId);
-        if(!exists){
-            throw new IllegalStateException(
-                    "company with id " + companyId + " does not exists"
-            );
-        }
-        companyRepository.deleteById(companyId);
+    public Company deleteCompany(Long companyId){
+        Company company = getCompanyById(companyId);
+        companyRepository.delete(company);
+        return company;
     }
 
     @Transactional
-    public void updateCompany(Long companyId,
+    public Company updateCompany(Long companyId,
                               String firstName,
                               String lastName,
                               String companyName,
                               String phone,
                               String fax,
                               String emailAddress){
-        Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new IllegalStateException(
-                        "company with id " + companyId + " does not exists"
-                ));
+        Company company = getCompanyById(companyId);
         if(firstName != null && firstName.length()>0){
             company.setFirstName(firstName);
         }
@@ -91,5 +89,22 @@ public class CompanyService {
         if(emailAddress !=null && emailAddress.length()>0) {
             company.setEmailAddress(emailAddress);
         }
+        return company;
+    }
+
+    @Transactional
+    public Company addAddressToCompany(Long companyId, Long addressId){
+        Company company = getCompanyById(companyId);
+        Address address = addressService.getAddressById(addressId);
+        company.getAddress().add(address);
+        return company;
+    }
+
+    @Transactional
+    public Company removeAddressFromCompany(Long companyId, Long addressId){
+        Company company = getCompanyById(companyId);
+        Address address = addressService.getAddressById(addressId);
+        company.getAddress().remove(address);
+        return company;
     }
 }

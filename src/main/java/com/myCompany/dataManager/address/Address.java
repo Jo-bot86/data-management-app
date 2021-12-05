@@ -14,9 +14,9 @@ public class Address {
     @NotNull
     private Long addressId;
 
-    /*@ManyToOne
-    @JoinColumn(name = "companyId")
-    private Long companyId;*/
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "company_id", referencedColumnName = "company_id")
+    private Company company;
 
     @Column(name="street", columnDefinition = "NVARCHAR(255)")
     @NotNull
@@ -60,13 +60,13 @@ public class Address {
         this.addressId = addressId;
     }
 
-    /*public Long getCompanyId() {
-        return companyId;
+    public Company getCompany() {
+        return company;
     }
 
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
-    }*/
+    public void setCompany(Company company) {
+        this.company = company;
+    }
 
     public String getStreet() {
         return street;

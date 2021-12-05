@@ -8,7 +8,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table
+@Table(name="company")
 @SQLDelete(sql = "UPDATE company SET isDeleted = true WHERE company_id=?")
 public class Company {
 
@@ -51,8 +51,8 @@ public class Company {
     @Column(name="isdeleted", columnDefinition="BIT")
     private Boolean isDeleted = Boolean.FALSE;
 
-    /*@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
-    private List<Address> address;*/
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    private List<Address> address;
 
     public Company() {
     }
@@ -64,6 +64,9 @@ public class Company {
                    String phone,
                    String fax,
                    String emailAddress
+/*
+                   List<Address> address
+*/
                    ) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -149,13 +152,13 @@ public class Company {
         isDeleted = deleted;
     }
 
-    /*public List<Address> getAddress() {
+    public List<Address> getAddress() {
         return address;
     }
 
     public void setAddress(List<Address> address){
         this.address = address;
-    }*/
+    }
 
     @Override
     public String toString() {
@@ -169,6 +172,7 @@ public class Company {
                 ", fax='" + fax + '\'' +
                 ", emailAddress='" + emailAddress + '\'' +
                 ", isDeleted=" + isDeleted +
+                ", address=" + address +
                 '}';
     }
 }
